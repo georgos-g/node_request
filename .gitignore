@@ -4,3 +4,4 @@ npm-debug.log
 /*.env
 
 credentials.json
+google-credentials.json

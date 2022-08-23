@@ -8,7 +8,7 @@ const port = process.env.PORT || 1555;
 app.get('/', async (req, res) => {
   // res.send('Hello World!');
   const auth = new google.auth.GoogleAuth({
-    keyFile: 'credentials.json',
+    keyFile: 'google-credentials.json',
     scopes: 'https://www.googleapis.com/auth/spreadsheets',
   });
 
