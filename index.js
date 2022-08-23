@@ -2,6 +2,9 @@ const express = require('express');
 const { google } = require('googleapis');
 const app = express();
 
+// define port for server
+const port = process.env.PORT || 1555;
+
 app.get('/', async (req, res) => {
   // res.send('Hello World!');
   const auth = new google.auth.GoogleAuth({
@@ -30,7 +33,6 @@ app.get('/', async (req, res) => {
   });
 
   // Append rows to spreadsheet
-
   await googleSheets.spreadsheets.values.append({
     auth,
     spreadsheetId,
@@ -40,10 +42,13 @@ app.get('/', async (req, res) => {
       values: [
         ['Amalia Galindo Gakis', '25.12.10'],
         ['Paloma Galindo Gakis', '08.07.15'],
+        ['Maria Gakis', '08.07.77'],
       ],
     },
   });
   res.send(getRows.data);
 });
 
-app.listen(1337, () => console.log('Example app listening on port 1337!'));
+console.log('port: ', port);
+
+app.listen(port, () => console.log('App listening on port 1555!'));
