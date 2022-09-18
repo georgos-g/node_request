@@ -1,9 +1,19 @@
 const express = require('express');
 const { google } = require('googleapis');
 const app = express();
+const fetch = require('node-fetch');
+
+// fetch data from API
+// fetch('https://api.covid19api.com/summary')
+//   .then((res) => res.json())
+//   .then((json) => console.log(json));
+
+// fetch('https://google.com')
+//   .then((res) => res.text())
+//   .then((text) => console.log(text));
 
 // define port for server
-const port = process.env.PORT || 1555;
+const port = process.env.PORT || 1553;
 
 app.get('/', async (req, res) => {
   // res.send('Hello World!');
@@ -43,6 +53,7 @@ app.get('/', async (req, res) => {
         ['Amalia Galindo Gakis', '25.12.10'],
         ['Paloma Galindo Gakis', '08.07.15'],
         ['Maria Gakis', '08.07.77'],
+        ['Marina GaGA', '08.07.77'],
       ],
     },
   });
@@ -51,4 +62,4 @@ app.get('/', async (req, res) => {
 
 console.log('port: ', port);
 
-app.listen(port, () => console.log('App listening on port 1555!'));
+app.listen(port, () => console.log('App listening on port 1553!'));
