@@ -12,8 +12,8 @@ import fetch from 'node-fetch';
 
 const app = express();
 
-import 'dotenv/config'; // loads env variables from .env file
 // const dotenv = require('dotenv/config');
+import 'dotenv/config'; // loads env variables from .env file
 
 const { PORT, IDEALO_CLIENT_ID, IDEALO_CLIENT_SECRET, GOOGLE_SPREADSHEET_ID } =
   process.env;
@@ -23,7 +23,12 @@ const port = process.env.PORT || 1553;
 console.log(PORT);
 
 app.get('/', async (req, res) => {
-  // res.send('Hello World!');
+  // Idealo API
+  const idealo_data = await generateAccessTokenFetch();
+  // res.json(idealo_data);
+  console.log('IDEALO:::', idealo_data);
+
+  // Google Sheets API
   const auth = new google.auth.GoogleAuth({
     keyFile: 'google-credentials.json',
     scopes: 'https://www.googleapis.com/auth/spreadsheets',
@@ -61,13 +66,30 @@ app.get('/', async (req, res) => {
         ['Paloma Galindo Gakis', '08.07.15'],
         ['Maria Gakis', '08.07.77'],
         ['Marina GaGA', '08.07.77'],
-        ['Amalia Galindo Gakis', '25.12.10'],
       ],
     },
   });
   res.send(getRows.data);
 });
 
-console.log('port: ', port);
+// get idealo access token
+
+async function generateAccessTokenFetch() {
+  const response = await fetch(
+    'https://businessapi.idealo.com/api/v1/oauth/token',
+    {
+      method: 'POST',
+      headers: {
+        Authorization:
+          'Basic ' +
+          Buffer.from(IDEALO_CLIENT_ID + ':' + IDEALO_CLIENT_SECRET).toString(
+            'base64'
+          ),
+      },
+    }
+  );
+  const idealo_data = await response.json();
+  return idealo_data;
+}
 
 app.listen(port, () => console.log('App listening on port ' + port));
