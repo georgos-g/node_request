@@ -1,19 +1,26 @@
-const express = require('express');
-const { google } = require('googleapis');
+// const express = require('express');
+import express from 'express';
+
+// const { response } = require('express');
+import { response } from 'express';
+
+// const { google } = require('googleapis');
+import { google } from 'googleapis';
+
+// const fetch = require('node-fetch');
+import fetch from 'node-fetch';
+
 const app = express();
-const fetch = require('node-fetch');
 
-// fetch data from API
-// fetch('https://api.covid19api.com/summary')
-//   .then((res) => res.json())
-//   .then((json) => console.log(json));
+import 'dotenv/config'; // loads env variables from .env file
+// const dotenv = require('dotenv/config');
 
-// fetch('https://google.com')
-//   .then((res) => res.text())
-//   .then((text) => console.log(text));
+const { PORT, IDEALO_CLIENT_ID, IDEALO_CLIENT_SECRET, GOOGLE_SPREADSHEET_ID } =
+  process.env;
 
 // define port for server
 const port = process.env.PORT || 1553;
+console.log(PORT);
 
 app.get('/', async (req, res) => {
   // res.send('Hello World!');
@@ -27,7 +34,7 @@ app.get('/', async (req, res) => {
 
   // Instance of Google Sheets API
   const googleSheets = google.sheets({ version: 'v4', auth: client });
-  const spreadsheetId = '1Ruc9qdOh2k_NiafWV5GDlq84lif-qYReurdWwDYc5Pk';
+  const spreadsheetId = process.env.GOOGLE_SPREADSHEET_ID;
 
   // Ger metadata about spreadsheets
   const metaData = await googleSheets.spreadsheets.get({
@@ -54,6 +61,7 @@ app.get('/', async (req, res) => {
         ['Paloma Galindo Gakis', '08.07.15'],
         ['Maria Gakis', '08.07.77'],
         ['Marina GaGA', '08.07.77'],
+        ['Amalia Galindo Gakis', '25.12.10'],
       ],
     },
   });
@@ -62,4 +70,4 @@ app.get('/', async (req, res) => {
 
 console.log('port: ', port);
 
-app.listen(port, () => console.log('App listening on port 1553!'));
+app.listen(port, () => console.log('App listening on port ' + port));
