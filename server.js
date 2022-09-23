@@ -4,16 +4,38 @@ import 'dotenv/config'; // loads env variables from .env file
 
 const { IDEALO_CLIENT_ID, IDEALO_CLIENT_SECRET } = process.env;
 
-const base = 'https://businessapi.idealo.com';
-
 const app = express();
 
 // test route
-app.get('/test', async (req, res) => {
-  const data = await generateAccessTokenFetch();
-  console.log(data);
-  res.json(data);
+app.get('/', async (req, res) => {
+  const idealo_data = await generateAccessTokenFetch();
+  console.log(idealo_data);
+  res.json(idealo_data);
 });
+
+// get idealo click report
+async function getClickReport() {
+  const idealo_data = await generateAccessTokenFetch();
+
+  const response = await fetch(
+    'https://businessapi.idealo.com/api/v1/shops/282197/click-reports',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `'Bearer ${idealo_data.access_token}'`,
+      },
+      body: JSON.stringify({
+        from: '2020-09-01',
+        to: '2020-09-20',
+      }),
+    }
+  );
+
+  // const idealo_click_data = await response.json();
+  const idealo_click_data = await response;
+  return idealo_click_data;
+}
 
 async function generateAccessTokenFetch() {
   const response = await fetch(
@@ -29,10 +51,10 @@ async function generateAccessTokenFetch() {
       },
     }
   );
-  const data = await response.json();
-  return data;
+  // const data = await response.json();
+  const idealo_data = await response.json();
+  // return data;
+  return idealo_data;
 }
-// export data from generateAccessTokenFetch
-export default app;
 
-// app.listen(3000);
+app.listen(3000);

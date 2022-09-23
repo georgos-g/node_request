@@ -1,34 +1,28 @@
-// const express = require('express');
 import express from 'express';
-
-// const { response } = require('express');
 import { response } from 'express';
-
-// const { google } = require('googleapis');
 import { google } from 'googleapis';
-
-// const fetch = require('node-fetch');
 import fetch from 'node-fetch';
+import 'dotenv/config'; // loads env variables from .env file
 
 const app = express();
-
-// const dotenv = require('dotenv/config');
-import 'dotenv/config'; // loads env variables from .env file
 
 const { PORT, IDEALO_CLIENT_ID, IDEALO_CLIENT_SECRET, GOOGLE_SPREADSHEET_ID } =
   process.env;
 
 // define port for server
 const port = process.env.PORT || 1553;
-console.log(PORT);
 
 app.get('/', async (req, res) => {
-  // Idealo API
+  // Idealo API access token
   const idealo_data = await generateAccessTokenFetch();
   // res.json(idealo_data);
-  console.log('IDEALO:::', idealo_data);
+  console.log('IDEALO:::', idealo_data.access_token);
 
-  // Google Sheets API
+  const idealo_click_data = await startClickReport();
+  console.log('idealo_click_data:::::: ', idealo_click_data);
+
+  //  ======================  Google Sheets API  ===============================
+
   const auth = new google.auth.GoogleAuth({
     keyFile: 'google-credentials.json',
     scopes: 'https://www.googleapis.com/auth/spreadsheets',
@@ -58,22 +52,21 @@ app.get('/', async (req, res) => {
   await googleSheets.spreadsheets.values.append({
     auth,
     spreadsheetId,
-    range: 'Sheet1!A:B',
+    range: 'Sheet1!A:B:C',
     valueInputOption: 'USER_ENTERED',
     resource: {
       values: [
-        ['Amalia Galindo Gakis', '25.12.10'],
-        ['Paloma Galindo Gakis', '08.07.15'],
-        ['Maria Gakis', '08.07.77'],
-        ['Marina GaGA', '08.07.77'],
+        ['Amalia', '25.12.10', 'Berlin'],
+        ['Paloma ', '08.07.15', 'Hamburg'],
+        ['Elena  ', '08.07.77', 'München'],
       ],
     },
   });
   res.send(getRows.data);
 });
+//  ======================  Idealo API  ===============================
 
 // get idealo access token
-
 async function generateAccessTokenFetch() {
   const response = await fetch(
     'https://businessapi.idealo.com/api/v1/oauth/token',
@@ -90,6 +83,30 @@ async function generateAccessTokenFetch() {
   );
   const idealo_data = await response.json();
   return idealo_data;
+}
+
+// start idealo click report
+async function startClickReport() {
+  const idealo_data = await generateAccessTokenFetch();
+  console.log('idealo_data____: ', idealo_data.access_token);
+
+  const response = await fetch(
+    'https://businessapi.idealo.com/api/v1/shops/12345/daily-click-reports/download?from=2020-09-01&to=2020-09-02',
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `'Bearer ${idealo_data.access_token}'`,
+      },
+      // body: JSON.stringify({
+      //   from: '2020-09-19',
+      //   to: '2020-09-20',
+      // }),
+    }
+  );
+
+  // const idealo_click_data = await response.json();
+  const idealo_click_data = await response;
+  return idealo_click_data;
 }
 
 app.listen(port, () => console.log('App listening on port ' + port));
