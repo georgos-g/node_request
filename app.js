@@ -5,17 +5,57 @@ import fetch from 'node-fetch';
 import 'dotenv/config'; // loads env variables from .env file
 import cron from 'node-cron';
 
+// add aws secret manager client
+import {
+  SecretsManagerClient,
+  CancelRotateSecretCommand,
+} from '@aws-sdk/client-secrets-manager';
+const client = new SecretsManagerClient({ region: 'eu-central-1' });
+
 const app = express();
 
-const {
-  PORT,
-  IDEALO_CLIENT_ID,
-  IDEALO_CLIENT_SECRET,
-  GOOGLE_SPREADSHEET_ID,
-  AWIN_ADVERTISER_ID,
-  AWIN_OAUTH_TOKEN,
-  AWIN_OAUTH2_TOKEN,
-} = process.env;
+// get secret data from aws client secret manager
+const getSecret = async () => {
+  const command = new CancelRotateSecretCommand({
+    SecretId: 'idealo-awin-click-report',
+  });
+  const data = await client.send(command);
+  return data;
+};
+getSecret().then((data) => {
+  const { SecretString, ARN, Name, VersionId, CreatedDate } =
+    data.CancelRotateSecretResponse;
+  const {
+    PORT,
+    IDEALO_CLIENT_ID,
+    IDEALO_CLIENT_SECRET,
+    GOOGLE_SPREADSHEET_ID,
+    AWIN_ADVERTISER_ID,
+    AWIN_OAUTH_TOKEN,
+    AWIN_OAUTH2_TOKEN,
+  } = JSON.parse(SecretString);
+});
+
+// if is development use env variables from .env file and make them global
+if (process.env.NODE_ENV === 'development') {
+  const {
+    PORT,
+    IDEALO_CLIENT_ID,
+    IDEALO_CLIENT_SECRET,
+    GOOGLE_SPREADSHEET_ID,
+    AWIN_ADVERTISER_ID,
+    AWIN_OAUTH_TOKEN,
+    AWIN_OAUTH2_TOKEN,
+  } = process.env;
+  // make IDEALO_CLIENT_ID,IDEALO_CLIENT_SECRET,GOOGLE_SPREADSHEET_ID,AWIN_ADVERTISER_ID,AWIN_OAUTH_TOKEN,AWIN_OAUTH2_TOKEN global
+  global.PORT = PORT;
+  global.IDEALO_CLIENT_ID = IDEALO_CLIENT_ID;
+  global.IDEALO_CLIENT_SECRET = IDEALO_CLIENT_SECRET;
+  global.GOOGLE_SPREADSHEET_ID = GOOGLE_SPREADSHEET_ID;
+  global.AWIN_ADVERTISER_ID = AWIN_ADVERTISER_ID;
+  global.AWIN_OAUTH_TOKEN = AWIN_OAUTH_TOKEN;
+  global.AWIN_OAUTH2_TOKEN = AWIN_OAUTH2_TOKEN;
+}
 
 // define port for server
 const port = process.env.PORT || 1553;
