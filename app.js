@@ -31,6 +31,8 @@ const port = process.env.PORT || 3000;
 
 // ======= Fn to fetch data from Idealo and Awin API ========
 const handleGetRequest = async (req, res) => {
+  console.log('requested all data from server');
+
   // ================ Idealo click report =================
   const idealo_download_click_report = await downloadClickReport();
   // convert csv data to an array
@@ -214,14 +216,20 @@ const handleGetRequest = async (req, res) => {
 // Run the initial app.get request at startup
 app.get('/', handleGetRequest);
 
-// Run the app.get request once every 24 hours
-
-// const intervalInMs = 15 * 1000; // 15 seconds  for testing
-const intervalInMs = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-setInterval(() => {
+// Run the app.get request as cron job every 24 hours at 00:01
+// cron.schedule('1 0 * * *', () => {
+cron.schedule('*/15 * * * * *', () => {
+  // every 15 seconds  for testing
   app.get('/', handleGetRequest);
-  console.log('Requested Data once in 24 Hours');
-}, intervalInMs);
+  console.log('Requested Data Cron Job');
+});
+
+// // const intervalInMs = 15 * 1000; // 15 seconds  for testing
+// const intervalInMs = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+// setInterval(() => {
+//   app.get('/', handleGetRequest);
+//   console.log('Requested Data once in 24 Hours');
+// }, intervalInMs);
 
 //  ======================  Awin API  ===============================
 async function getAwinClickReport() {
