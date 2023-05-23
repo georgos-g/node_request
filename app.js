@@ -215,21 +215,15 @@ const handleGetRequest = async (req, res) => {
 
 // Run the initial app.get request at startup
 app.get('/', handleGetRequest);
+console.log('Requested Data at startup');
 
 // Run the app.get request as cron job every 24 hours at 00:01
-// cron.schedule('1 0 * * *', () => {
-cron.schedule('*/15 * * * * *', () => {
+cron.schedule('1 0 * * *', () => {
   // every 15 seconds  for testing
+  // cron.schedule('*/15 * * * * *', () => {
   app.get('/', handleGetRequest);
   console.log('Requested Data Cron Job');
 });
-
-// // const intervalInMs = 15 * 1000; // 15 seconds  for testing
-// const intervalInMs = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-// setInterval(() => {
-//   app.get('/', handleGetRequest);
-//   console.log('Requested Data once in 24 Hours');
-// }, intervalInMs);
 
 //  ======================  Awin API  ===============================
 async function getAwinClickReport() {

@@ -6,6 +6,28 @@ npm install
 
 `npm install`
 
+## add secrets to local .env file
+
+NODE_ENV=development
+
+PORT=3000
+
+GOOGLE_SPREADSHEET_ID=
+
+IDEALO_CLIENT_ID=
+
+IDEALO_CLIENT_SECRET=
+
+IDEALO_SHOP_ID=
+
+AWIN_OAUTH2_TOKEN=
+
+AWIN_OAUTH_TOKEN=
+
+AWIN_ADVERTISER_ID=
+
+## ----
+
 ## run node app
 
 `node app.js`
